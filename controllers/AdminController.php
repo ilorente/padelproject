@@ -1,0 +1,1 @@
+<?php class AdminController { public function dashboard(){} public function create(){} public function store(){} public function edit(){} } ?>
