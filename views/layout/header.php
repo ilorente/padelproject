@@ -1,36 +1,55 @@
-<!DOCTYPE html>
+<?php
+$cartCount = 0;
+if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+    foreach ($_SESSION['cart'] as $it) $cartCount += (int)$it['quantity'];
+}
+$user = $_SESSION['user'] ?? null;
+?>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PadelPro V5</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root { --primary: #ff6600; --dark: #131921; }
-        body { font-family: sans-serif; background-color: #f8f9fa; }
-        .top-nav { background-color: var(--dark); padding: 10px 0; }
-        .logo { color: white; font-weight: bold; font-size: 24px; text-decoration: none; }
-        .logo span { color: var(--primary); }
-        .nav-link { color: white !important; }
-        .product-card img { transition: transform 0.3s; }
-        .product-card:hover img { transform: scale(1.05); }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><?= APP_NAME ?></title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="<?= ASSETS_URL ?>/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-<header>
-    <div class="top-nav">
-        <div class="container d-flex justify-content-between align-items-center">
-            <a href="<?= BASE_URL ?>/" class="logo">PADEL<span>PRO</span></a>
 
-            <nav>
-                <a href="<?= BASE_URL ?>/" class="btn btn-link nav-link">Inicio</a>
-                <a href="<?= BASE_URL ?>/products" class="btn btn-link nav-link">Catálogo</a>
-                <a href="<?= BASE_URL ?>/cart" class="btn btn-warning text-dark fw-bold rounded-pill px-3">
-                    <i class="fas fa-shopping-cart"></i> <span class="cart-count"><?= isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0 ?></span>
-                </a>
-            </nav>
-        </div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="<?= BASE_URL ?>/home">
+      <img src="<?= ASSETS_URL ?>/img/logo.png" alt="Logo" class="logo">
+      <span><?= APP_NAME ?></span>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+        <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/products">Productos</a></li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="<?= BASE_URL ?>/cart">
+            <i class="fas fa-shopping-cart"></i> Carrito
+            <span id="cartCountBadge" class="badge bg-warning text-dark"><?= $cartCount ?></span>
+          </a>
+        </li>
+
+        <?php if ($user): ?>
+          <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/orders">Mis pedidos</a></li>
+          <li class="nav-item"><span class="nav-link text-white-50">Hola, <?= htmlspecialchars($user['name']) ?></span></li>
+          <li class="nav-item"><a class="btn btn-outline-light btn-sm" href="<?= BASE_URL ?>/logout">Logout</a></li>
+        <?php else: ?>
+          <li class="nav-item"><a class="btn btn-warning btn-sm" href="<?= BASE_URL ?>/login">Login</a></li>
+        <?php endif; ?>
+      </ul>
     </div>
-</header>
+  </div>
+</nav>
+
 <main class="container py-4">

@@ -3,8 +3,8 @@
 $scriptName = $_SERVER['SCRIPT_NAME'];
 $dirName = dirname($scriptName);
 
-// Normalizar barra invertida en Windows de forma segura
-$backslash = chr(92); // Código ASCII de la barra invertida
+// Normalizar barra invertida en Windows
+$backslash = chr(92);
 $dirName = str_replace($backslash, '/', $dirName);
 
 // Asegurar que no hay barra al final (excepto si es raíz)
@@ -14,7 +14,6 @@ if ($dirName !== '/') {
     $dirName = '';
 }
 
-define('BASE_URL', $dirName); 
+define('BASE_URL', $dirName);
 define('ASSETS_URL', BASE_URL . '/public');
-define('APP_NAME', 'PadelPro Final');
-?>
+define('APP_NAME', 'PadelPro');

@@ -4,7 +4,7 @@ require_once 'config/config.php';
 
 // Autoload
 spl_autoload_register(function ($class) {
-    $paths = ['models/', 'controllers/'];
+    $paths = ['models/', 'controllers/', 'config/'];
     foreach ($paths as $path) {
         if (file_exists($path . $class . '.php')) {
             require_once $path . $class . '.php';
@@ -21,8 +21,7 @@ $dirName = dirname($scriptName);
 // 1. Quitar Query String
 $request = strtok($request, '?');
 
-// 2. Normalizar barras para Windows (AQUÍ ESTABA EL ERROR)
-// Usamos chr(92) que es la barra invertida para evitar líos de sintaxis
+// 2. Normalizar barras para Windows
 $backslash = chr(92);
 $request = str_replace($backslash, '/', $request);
 $dirName = str_replace($backslash, '/', $dirName);
@@ -46,43 +45,90 @@ if (strlen($route) > 1) {
 // === FIN ROUTER ===
 
 switch ($route) {
+
+    // ✅ AJAX endpoints (JSON)
+    case '/ajax/cart/add':
+        require_once __DIR__ . '/controllers/ajax_cart_add.php';
+        break;
+
+    case '/ajax/cart/remove':
+        require_once __DIR__ . '/controllers/ajax_cart_remove.php';
+        break;
+
+    case '/ajax/cart/update':
+        require_once __DIR__ . '/controllers/ajax_cart_update.php';
+        break;
+
+    // HOME / PRODUCTS
     case '/home':
         $controller = new ProductController();
         $controller->index();
         break;
-        
+
     case '/products':
         $controller = new ProductController();
         $controller->index();
         break;
-        
+
     case (preg_match('/^\/product\/(\d+)$/', $route, $matches) ? true : false):
         $controller = new ProductController();
-        $controller->show($matches[1]);
+        $controller->show((int)$matches[1]);
         break;
 
+    // === CARRITO ===
     case '/cart':
         $controller = new CartController();
         $controller->index();
         break;
+
     case '/cart/add':
         $controller = new CartController();
         $controller->add();
         break;
+
     case '/cart/remove':
         $controller = new CartController();
         $controller->remove();
         break;
 
+    case '/cart/update':
+        $controller = new CartController();
+        $controller->update();
+        break;
+
+    // === AUTH ===
     case '/login':
         $controller = new AuthController();
         $controller->login();
         break;
+
+    case '/register':
+        $controller = new AuthController();
+        $controller->register();
+        break;
+
     case '/logout':
         $controller = new AuthController();
         $controller->logout();
         break;
 
+    // === PEDIDOS ===
+    case '/orders':
+        $controller = new OrderController();
+        $controller->index();
+        break;
+
+    case '/checkout':
+        $controller = new OrderController();
+        $controller->checkout();
+        break;
+
+    case (preg_match('/^\/order\/(\d+)$/', $route, $matches) ? true : false):
+        $controller = new OrderController();
+        $controller->show((int)$matches[1]);
+        break;
+
+    // === ADMIN (opcional) ===
     case '/admin':
         $controller = new AdminController();
         $controller->dashboard();
@@ -92,7 +138,7 @@ switch ($route) {
         http_response_code(404);
         require_once 'views/layout/header.php';
         echo "<div class='container py-5 text-center'><h1>404</h1><p>Página no encontrada</p>";
-        echo "<a href='".BASE_URL."/' class='btn btn-primary'>Volver al Inicio</a></div>";
+        echo "<a href='".BASE_URL."/home' class='btn btn-primary'>Volver al Inicio</a></div>";
         require_once 'views/layout/footer.php';
         break;
 }

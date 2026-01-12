@@ -8,14 +8,18 @@ class Database {
 
     public function getConnection() {
         $this->conn = null;
+
         try {
-            $this->conn = new PDO("mysql:host=".$this->host.";dbname=".$this->db_name, $this->username, $this->password);
-            $this->conn->exec("set names utf8");
+            $dsn = "mysql:host={$this->host};dbname={$this->db_name};charset=utf8mb4";
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ];
+            $this->conn = new PDO($dsn, $this->username, $this->password, $options);
         } catch(PDOException $exception) {
-            // Error silencioso en producción, pero útil aquí
             die("Error de Conexión DB: " . $exception->getMessage() . "<br>Revisa config/database.php");
         }
+
         return $this->conn;
     }
 }
-?>

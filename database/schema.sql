@@ -1,24 +1,58 @@
 CREATE DATABASE IF NOT EXISTS tienda_padel;
 USE tienda_padel;
 
-CREATE TABLE IF NOT EXISTS users (
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100), email VARCHAR(100) UNIQUE, password VARCHAR(255),
-    role ENUM('user', 'admin') DEFAULT 'user', security_question VARCHAR(255), security_answer VARCHAR(255)
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('user','admin') DEFAULT 'user',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS products (
+CREATE TABLE products (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(200), brand VARCHAR(50), description TEXT, short_description VARCHAR(255),
-    price DECIMAL(10,2), image VARCHAR(500), stock INT, category VARCHAR(50)
+    name VARCHAR(200) NOT NULL,
+    brand VARCHAR(50),
+    description TEXT,
+    short_description VARCHAR(255),
+    price DECIMAL(10,2) NOT NULL,
+    image VARCHAR(500) NOT NULL,
+    stock INT DEFAULT 0,
+    category VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    total DECIMAL(10,2) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'paid',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    product_name VARCHAR(200) NOT NULL,
+    unit_price DECIMAL(10,2) NOT NULL,
+    quantity INT NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id)
+);
+
+-- Admin (password: password)
 INSERT INTO users (name, email, password, role) VALUES
 ('Admin', 'admin@padelpro.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
 
-TRUNCATE TABLE products;
-
--- IMÁGENES QUE FUNCIONAN SIEMPRE (Placehold.co genera la imagen al vuelo con texto)
+-- Productos demo
 INSERT INTO products (name, brand, category, price, stock, image, short_description, description) VALUES
 ('Bullpadel Vertex 03', 'Bullpadel', 'Palas', 249.95, 20, 'https://placehold.co/400x400/232f3e/FFF?text=Bullpadel+Vertex', 'Potencia máxima', 'La pala definitiva de potencia.'),
 ('Nox AT10 Genius 18K', 'Nox', 'Palas', 285.00, 15, 'https://placehold.co/400x400/232f3e/FFF?text=Nox+AT10', 'La joya de Tapia', 'Carbono 18K para un tacto único.'),

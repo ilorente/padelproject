@@ -1,23 +1,21 @@
 <?php
-require_once 'config/database.php';
 class Product {
-    private $conn;
-    public $id; public $name; public $price; public $image; public $description; public $category; public $brand; public $stock;
+    private PDO $conn;
 
-    public function __construct() { $db = new Database(); $this->conn = $db->getConnection(); }
-
-    public function getAll() {
-        $stmt = $this->conn->prepare("SELECT * FROM products ORDER BY id DESC");
-        $stmt->execute();
-        return $stmt;
+    public function __construct() {
+        $db = new Database();
+        $this->conn = $db->getConnection();
     }
-    public function getById($id) {
+
+    public function all(): array {
+        $stmt = $this->conn->query("SELECT * FROM products ORDER BY id DESC");
+        return $stmt->fetchAll();
+    }
+
+    public function find(int $id): ?array {
         $stmt = $this->conn->prepare("SELECT * FROM products WHERE id = ?");
         $stmt->execute([$id]);
-        if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            foreach ($row as $key => $val) $this->$key = $val;
-            return true;
-        } return false;
+        $row = $stmt->fetch();
+        return $row ?: null;
     }
 }
-?>
